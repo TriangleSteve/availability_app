@@ -132,6 +132,21 @@ elif page == "Analysis" and is_admin:
 elif page == "Admin" and is_admin:
     st.title("Admin Panel")
     
+    # Load responses for editing
+    df = load_responses()
+    if df is not None:
+        st.subheader("Current Availability Records")
+        edited_rows = []
+
+        for index, row in df.iterrows():
+            with st.expander(f"Edit Record for {row['name']}"):
+                name = st.text_input("Name", value=row['name'], key=f"name_{index}")
+                times = st.text_input("Available Times", value=row['times'], key=f"times_{index}")
+                if st.button("Update", key=f"update_{index}"):
+                    update_response(name, times)
+                    st.success(f"Record for {name} updated successfully!")
+                    edited_rows.append((name, times))
+
     if st.button("Clear Database"):
         clear_database()
         st.success("Database cleared successfully!")
