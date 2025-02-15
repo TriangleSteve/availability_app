@@ -11,7 +11,7 @@ def get_connection():
 utc_slots = [f"{h:02d}:{m:02d}" for h in range(24) for m in (0, 30)]
 
 # Define the admin password
-ADMIN_PASSWORD = "toronto"  # Change this to your desired password
+ADMIN_PASSWORD = "toronto"
 
 def save_response(name, selected_times):
     """Save user availability to SQLite Cloud."""
@@ -149,7 +149,9 @@ elif page == "Admin" and is_admin:
         st.subheader("Current Availability Records")
 
         # Add a selection column for deletion
-        df["selected"] = False
+        df.insert(0, "selected", False)  # Insert checkbox column at the first position
+
+        # Use Streamlit's interactive data editor
         edited_df = st.data_editor(
             df,
             column_config={"selected": st.column_config.CheckboxColumn("Select")},
@@ -170,6 +172,6 @@ elif page == "Admin" and is_admin:
     if st.button("Clear Database", type="secondary"):
         clear_database()
         st.success("Database cleared successfully!")
-        st.experimental_rerun()
+        st.rerun()
 
 
