@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import sqlitecloud
+from itertools import combinations
 
 # SQLite Cloud connection
 def get_connection():
@@ -29,7 +30,7 @@ def load_responses():
     return df if not df.empty else None
 
 def find_best_meeting_times():
-    """Find the best two meeting times ensuring each person can attend."""
+    """Find the best two meeting times ensuring each person can attend without repeats."""
     df = load_responses()
     if df is None:
         return None, {}, []
@@ -42,12 +43,19 @@ def find_best_meeting_times():
                 attendees[time] = []
             attendees[time].append(row["name"])
 
-    # Sort times by number of attendees
-    sorted_times = sorted(attendees.items(), key=lambda x: len(x[1]), reverse=True)
-    
-    # Get the top two times
-    best_times = sorted_times[:2]
-    return best_times, {time: names for time, names in best_times}
+    best_combination = None
+    max_unique_attendees = 0
+    best_attendees = {}
+
+    # Check all combinations of two time slots
+    for time1, time2 in combinations(attendees.keys(), 2):
+        unique_attendees = set(attendees[time1]) | set(attendees[time2])
+        if len(unique_attendees) > max_unique_attendees:
+            max_unique_attendees = len(unique_attendees)
+            best_combination = (time1, time2)
+            best_attendees = {time1: attendees[time1], time2: attendees[time2]}
+
+    return best_combination, best_attendees
 
 def clear_database():
     """Clear the database table."""
@@ -85,9 +93,24 @@ elif page == "View Best Times":
     best_times, attendees = find_best_meeting_times()
 
     if best_times:
-        for time, names in best_times:
-            st.write(f"**Best Meeting Time:** {time} UTC")
-            st.write("**Attendees:**", ", ".join(names))
+        time1, time2 = best_times
+        st.write(f"**Best Meeting Time 1:** {time1} UTC")
+        st.write(f"**Best Meeting Time 2:** {time2} UTC")
+
+        # Create a DataFrame for display
+        df_display = pd.DataFrame({
+            time1: attendees[time1],
+            time2: attendees[time2]
+        })
+
+        # Display the DataFrame in two columns
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(f"**Attendees for {time1}**")
+            st.dataframe(df_display[[time1]].rename(columns={time1: "Names"}))
+        with col2:
+            st.write(f"**Attendees for {time2}**")
+            st.dataframe(df_display[[time2]].rename(columns={time2: "Names"}))
     else:
         st.warning("No responses available yet.")
 
@@ -96,4 +119,4 @@ elif page == "Admin":
     
     if st.button("Clear Database"):
         clear_database()
-        st.success("Database cleared successfully!")
+        st.success
