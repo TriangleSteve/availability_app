@@ -66,7 +66,7 @@ if page == "Submit Availability":
 
     name = st.text_input("Your Name")
 
-    st.subheader("Select your available half-hour slots for the day:")
+    st.subheader("Select your available half-hour slots for the day (Time in UTC):")
     selected_times = []
     for slot in utc_slots:
         if st.checkbox(slot):
