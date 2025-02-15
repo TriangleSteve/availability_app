@@ -60,6 +60,14 @@ def find_best_meeting_times():
 
     return best_combination, best_attendees
 
+def delete_responses(names):
+    """Delete user availability from SQLite Cloud."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.executemany("DELETE FROM availability WHERE name = ?", [(name,) for name in names])
+    conn.commit()
+    conn.close()
+
 def clear_database():
     """Clear the database table."""
     conn = get_connection()
@@ -131,23 +139,37 @@ elif page == "Analysis" and is_admin:
 
 elif page == "Admin" and is_admin:
     st.title("Admin Panel")
-    
-    # Load responses for editing
+
+    # Load responses
     df = load_responses()
-    if df is not None:
+
+    if df is None:
+        st.write("No responses found.")
+    else:
         st.subheader("Current Availability Records")
-        edited_rows = []
 
-        for index, row in df.iterrows():
-            with st.expander(f"Edit Record for {row['name']}"):
-                name = st.text_input("Name", value=row['name'], key=f"name_{index}")
-                times = st.text_input("Available Times", value=row['times'], key=f"times_{index}")
-                if st.button("Update", key=f"update_{index}"):
-                    update_response(name, times)
-                    st.success(f"Record for {name} updated successfully!")
-                    edited_rows.append((name, times))
+        # Add a selection column for deletion
+        df["selected"] = False
+        edited_df = st.data_editor(
+            df,
+            column_config={"selected": st.column_config.CheckboxColumn("Select")},
+            disabled=["name", "times"],  # Prevent direct editing
+            use_container_width=True,
+        )
 
-    if st.button("Clear Database"):
+        # Get selected names
+        selected_names = edited_df[edited_df["selected"]]["name"].tolist()
+
+        # Delete button
+        if st.button("Delete Selected Responses", type="primary", disabled=not selected_names):
+            delete_responses(selected_names)
+            st.success(f"Deleted {len(selected_names)} responses.")
+            st.experimental_rerun()  # Refresh data after deletion
+
+    # Option to clear all data
+    if st.button("Clear Database", type="secondary"):
         clear_database()
         st.success("Database cleared successfully!")
+        st.experimental_rerun()
+
 
