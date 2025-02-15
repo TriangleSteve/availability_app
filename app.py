@@ -104,14 +104,14 @@ elif page == "View Best Times":
             time2: attendees[time2] + [None] * (max_length - len(attendees[time2]))
         })
 
-        # Display the DataFrame in two columns
+        # Display the DataFrame in two columns without index
         col1, col2 = st.columns(2)
         with col1:
             st.write(f"**Attendees for {time1}**")
-            st.dataframe(df_display[[time1]].rename(columns={time1: "Names"}))
+            st.table(df_display[[time1]].rename(columns={time1: "Names"}))
         with col2:
             st.write(f"**Attendees for {time2}**")
-            st.dataframe(df_display[[time2]].rename(columns={time2: "Names"}))
+            st.table(df_display[[time2]].rename(columns={time2: "Names"}))
     else:
         st.warning("No responses available yet.")
 
