@@ -1,1 +1,5 @@
 sqlitecloud==0.0.83
+matplotlib
+seaborn
+pandas
+pytz
