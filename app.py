@@ -96,7 +96,7 @@ if page == "Event Times Intake":
 
     name = st.text_input("Enter Username")
 
-    st.subheader("Choose all times available for events (UTC time):")
+    st.subheader("Select all available event times (UTC time):")
     selected_times = []
     for slot in utc_slots:
         if st.checkbox(slot):
