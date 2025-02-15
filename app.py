@@ -10,6 +10,9 @@ def get_connection():
 # Generate half-hour time slots
 utc_slots = [f"{h:02d}:{m:02d}" for h in range(24) for m in (0, 30)]
 
+# Define the admin password
+ADMIN_PASSWORD = "whiteoutsurvival"  # Change this to your desired password
+
 def save_response(name, selected_times):
     """Save user availability to SQLite Cloud."""
     conn = get_connection()
@@ -67,7 +70,18 @@ def clear_database():
 
 # Streamlit App
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Submit Availability", "View Best Times", "Admin"])
+
+# Password input for admin access
+password = st.sidebar.text_input("Admin Password", type="password")
+
+# Check if the entered password is correct
+is_admin = password == ADMIN_PASSWORD
+
+# Show navigation options based on admin status
+if is_admin:
+    page = st.sidebar.radio("Go to", ["Submit Availability", "View Best Times", "Admin"])
+else:
+    page = st.sidebar.radio("Go to", ["Submit Availability"])
 
 if page == "Submit Availability":
     st.title("Submit Your Availability")
@@ -87,7 +101,7 @@ if page == "Submit Availability":
         else:
             st.error("Please fill out all fields.")
 
-elif page == "View Best Times":
+elif page == "View Best Times" and is_admin:
     st.title("Optimal Meeting Times")
     
     best_times, attendees = find_best_meeting_times()
@@ -115,9 +129,10 @@ elif page == "View Best Times":
     else:
         st.warning("No responses available yet.")
 
-elif page == "Admin":
+elif page == "Admin" and is_admin:
     st.title("Admin Panel")
     
     if st.button("Clear Database"):
         clear_database()
-        st.success
+        st.success("Database cleared successfully!")
+
