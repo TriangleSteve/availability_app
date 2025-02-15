@@ -74,7 +74,7 @@ if page == "Submit Availability":
 
     name = st.text_input("Your Name")
 
-    st.subheader("Select your available half-hour slots for the day (Time in UTC):")
+    st.subheader("Select your available half-hour slots for the day:")
     selected_times = []
     for slot in utc_slots:
         if st.checkbox(slot):
@@ -98,9 +98,10 @@ elif page == "View Best Times":
         st.write(f"**Best Meeting Time 2:** {time2} UTC")
 
         # Create a DataFrame for display
+        max_length = max(len(attendees[time1]), len(attendees[time2]))
         df_display = pd.DataFrame({
-            time1: attendees[time1],
-            time2: attendees[time2]
+            time1: attendees[time1] + [None] * (max_length - len(attendees[time1])),
+            time2: attendees[time2] + [None] * (max_length - len(attendees[time2]))
         })
 
         # Display the DataFrame in two columns
