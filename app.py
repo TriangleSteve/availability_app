@@ -164,7 +164,7 @@ elif page == "Admin" and is_admin:
         if st.button("Delete Selected Responses", type="primary", disabled=not selected_names):
             delete_responses(selected_names)
             st.success(f"Deleted {len(selected_names)} responses.")
-            st.experimental_rerun()  # Refresh data after deletion
+            st.rerun()  # Refresh data after deletion
 
     # Option to clear all data
     if st.button("Clear Database", type="secondary"):
