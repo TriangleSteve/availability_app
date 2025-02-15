@@ -11,7 +11,7 @@ def get_connection():
 utc_slots = [f"{h:02d}:{m:02d}" for h in range(24) for m in (0, 30)]
 
 # Define the admin password
-ADMIN_PASSWORD = "whiteoutsurvival"  # Change this to your desired password
+ADMIN_PASSWORD = "toronto"  # Change this to your desired password
 
 def save_response(name, selected_times):
     """Save user availability to SQLite Cloud."""
@@ -79,16 +79,16 @@ is_admin = password == ADMIN_PASSWORD
 
 # Show navigation options based on admin status
 if is_admin:
-    page = st.sidebar.radio("Go to", ["Submit Availability", "View Best Times", "Admin"])
+    page = st.sidebar.radio("Go to", ["Event Times Intake", "Analysis", "Admin"])
 else:
-    page = st.sidebar.radio("Go to", ["Submit Availability"])
+    page = st.sidebar.radio("Go to", ["Event Times Intake"])
 
-if page == "Submit Availability":
-    st.title("Submit Your Availability")
+if page == "Event Times Intake":
+    st.title("Event Times")
 
-    name = st.text_input("Your Name")
+    name = st.text_input("Enter Username")
 
-    st.subheader("Select your available half-hour slots for the day:")
+    st.subheader("Choose all times available for events (UTC time):")
     selected_times = []
     for slot in utc_slots:
         if st.checkbox(slot):
@@ -101,7 +101,7 @@ if page == "Submit Availability":
         else:
             st.error("Please fill out all fields.")
 
-elif page == "View Best Times" and is_admin:
+elif page == "Analysis" and is_admin:
     st.title("Optimal Meeting Times")
     
     best_times, attendees = find_best_meeting_times()
